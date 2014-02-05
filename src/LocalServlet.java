@@ -5,24 +5,25 @@ import Magento.Mage_Api_Model_Server_V2_HandlerPortType;
 import Magento.Mage_Api_Model_Server_V2_HandlerPortTypeProxy;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.charset.Charset;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.MimeHeaders;
-import javax.xml.soap.SOAPConnection;
-import javax.xml.soap.SOAPConnectionFactory;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 
 /**
  * Servlet implementation class LocalServlet
@@ -70,9 +71,13 @@ public class LocalServlet extends HttpServlet {
             newCustomer.setEmail(email);
             newCustomer.setPassword(pass);
 
-            URL url = new URL(address);
+            // URL url = new URL(address);
+            //
+            // HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            HttpClient httpClient = new DefaultHttpClient();
+            HttpPost httpPost = new HttpPost("http://myopenissues.com/magento/index.php/");
+
 
             String data = "<soapenv:Envelope xmlns:xsi=" + "http://www.w3.org/2001/XMLSchema-instance" + " xmlns:xsd=" + "http://www.w3.org/2001/XMLSchema" + " xmlns:soapenv="
                     + "http://schemas.xmlsoap.org/soap/envelope/" + " xmlns:urn=" + "urn:Magento" + ">" + "<soapenv:Header/>" + "<soapenv:Body>"
@@ -81,28 +86,23 @@ public class LocalServlet extends HttpServlet {
                     + "</firstname>" + "<lastname xsi:type=\"xsd:string\">" + lname + "</lastname>" + "<password xsi:type=\"xsd:string\">" + pass + "</password>" + "</customerData>"
                     + "</urn:customerCustomerCreate>" + "</soapenv:Body>" + "</soapenv:Envelope>";
 
+            StringEntity stringentity = new StringEntity(data, "UTF-8");
+
+
             SOAPMessage soapMessage = getSoapMessageFromString(data);
 
-            // connection.setRequestProperty("Content-Length", String.valueOf(soapMessage));
-            connection.setRequestProperty("Content-Type", "text/xml");
-            connection.setRequestProperty("Connection", "Close");
-            connection.setRequestProperty("SoapAction", "");
-            connection.setDoOutput(true);
+            httpPost.addHeader("Accept", "text/xml");
+            httpPost.addHeader("SOAPAction", "to register");
 
-            PrintWriter pw = new PrintWriter(connection.getOutputStream());
-            pw.write(soapMessage.toString());
+            HttpResponse httpResponse = httpClient.execute(httpPost);
+            HttpEntity entity = httpResponse.getEntity();
 
-            pw.flush();
+            String strresponse = null;
+            if (entity != null) {
+                strresponse = EntityUtils.toString(entity);
+                System.out.println(strresponse);
+            }
 
-            SOAPConnectionFactory sfc = SOAPConnectionFactory.newInstance();
-            SOAPConnection connectionres = sfc.createConnection();
-
-            MessageFactory mf = MessageFactory.newInstance();
-            SOAPMessage sm = mf.createMessage();
-            QName bodyName = new QName("http://myopenissues.com/magento/index.php", "GetQuote", "d");
-            URL endpoint = new URL("http://myopenissues.com/magento/index.php");
-            SOAPMessage soapresponse = connectionres.call(sm, endpoint);
-            printSOAPResponse(soapresponse);
 
         }
         catch (Exception ex) {
