@@ -76,7 +76,7 @@ public class LocalServlet extends HttpServlet {
             // HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
             HttpClient httpClient = new DefaultHttpClient();
-            HttpPost httpPost = new HttpPost("http://myopenissues.com/magento/index.php/");
+            HttpPost httpPost = new HttpPost(address);
 
 
             String data = "<soapenv:Envelope xmlns:xsi=" + "http://www.w3.org/2001/XMLSchema-instance" + " xmlns:xsd=" + "http://www.w3.org/2001/XMLSchema" + " xmlns:soapenv="
@@ -106,6 +106,7 @@ public class LocalServlet extends HttpServlet {
 
         }
         catch (Exception ex) {
+            ex.printStackTrace();
             // TODO handle custom exceptions here
         }
 
