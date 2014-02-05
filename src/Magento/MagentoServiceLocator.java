@@ -70,6 +70,7 @@ public class MagentoServiceLocator extends org.apache.axis.client.Service implem
      * If this service has no port for the given interface,
      * then ServiceException is thrown.
      */
+    @Override
     public java.rmi.Remote getPort(Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         try {
             if (Magento.Mage_Api_Model_Server_V2_HandlerPortType.class.isAssignableFrom(serviceEndpointInterface)) {
@@ -89,6 +90,7 @@ public class MagentoServiceLocator extends org.apache.axis.client.Service implem
      * If this service has no port for the given interface,
      * then ServiceException is thrown.
      */
+    @Override
     public java.rmi.Remote getPort(javax.xml.namespace.QName portName, Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         if (portName == null) {
             return getPort(serviceEndpointInterface);
@@ -104,12 +106,14 @@ public class MagentoServiceLocator extends org.apache.axis.client.Service implem
         }
     }
 
+    @Override
     public javax.xml.namespace.QName getServiceName() {
         return new javax.xml.namespace.QName("urn:Magento", "MagentoService");
     }
 
     private java.util.HashSet ports = null;
 
+    @Override
     public java.util.Iterator getPorts() {
         if (ports == null) {
             ports = new java.util.HashSet();

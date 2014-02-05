@@ -87,7 +87,7 @@ public class LocalServlet extends HttpServlet {
                     + "</urn:customerCustomerCreate>" + "</soapenv:Body>" + "</soapenv:Envelope>";
 
             StringEntity stringentity = new StringEntity(data, "UTF-8");
-
+            stringentity.setChunked(false);
 
             SOAPMessage soapMessage = getSoapMessageFromString(data);
 
